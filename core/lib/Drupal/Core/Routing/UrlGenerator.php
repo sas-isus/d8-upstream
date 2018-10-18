@@ -148,7 +148,7 @@ class UrlGenerator implements UrlGeneratorInterface {
    * examined for changes in new Symfony releases.
    *
    * @param array $variables
-   *   The variables form the compiled route, corresponding to slugs in the
+   *   The variables from the compiled route, corresponding to slugs in the
    *   route path.
    * @param array $defaults
    *   The defaults from the route.
@@ -296,6 +296,11 @@ class UrlGenerator implements UrlGeneratorInterface {
     $options['route'] = $route;
     if ($options['path_processing']) {
       $path = $this->processPath($path, $options, $generated_url);
+    }
+    // Ensure the resulting path has at most one leading slash, to prevent it
+    // becoming an external URL without a protocol like //example.com.
+    if (strpos($path, '//') === 0) {
+      $path = '/' . ltrim($path, '/');
     }
     // The contexts base URL is already encoded
     // (see Symfony\Component\HttpFoundation\Request).
