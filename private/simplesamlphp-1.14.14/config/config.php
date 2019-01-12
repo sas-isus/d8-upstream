@@ -4,20 +4,25 @@
  *
  */
 
+
 if (!ini_get('session.save_handler')) {
     ini_set('session.save_handler', 'file');
 }
 
-$host = $_SERVER['HTTP_HOST'];
+if (file_exists($_SERVER['DOCUMENT_ROOT']. '/sites/default/settings.sas-functions.php')) {
+        require_once($_SERVER['DOCUMENT_ROOT']. '/sites/default/settings.sas-functions.php');
+}
+
+$BaseURL = getBaseURL();
+
 if ((isset($_ENV)) && (isset($_ENV['PANTHEON_ENVIRONMENT']))) {
 	$ps = json_decode($_SERVER['PRESSFLOW_SETTINGS'], TRUE);
 	$drop_id = $ps['conf']['pantheon_binding'];
 	$db = $ps['databases']['default']['default'];
-    $certdir = '/srv/bindings/'. $drop_id .'/code/private/saml-cert/';
+	$certdir = '/srv/bindings/'. $drop_id .'/code/private/saml-cert/';
 	$tempdir = '/srv/bindings/'. $drop_id .'/tmp/simplesaml';
 } else {
-	include $_SERVER['DOCUMENT_ROOT'] . '/sites/default/settings.php';
-    $certdir = 'cert/';
+	$certdir = 'cert/';
 	$tempdir = '/tmp/simplesaml';
 	$db = $databases['default']['default'];
 }
@@ -39,7 +44,7 @@ $config = array(
      * external url, no matter where you come from (direct access or via the
      * reverse proxy).
      */
-	 'baseurlpath'           => 'https://'. $host .'/simplesaml/',
+	 'baseurlpath'           => $BaseURL . '/simplesaml/',
 	 'certdir'               => $certdir,
 	 'loggingdir'            => 'log/',
 	 'datadir'               => 'data/',
